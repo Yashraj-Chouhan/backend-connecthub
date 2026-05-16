@@ -65,6 +65,8 @@ public class JwtFilter implements GlobalFilter, Ordered {
                 || isPathPublic(path, "/api/translate")
                 || isPathPublic(path, "/transcribe")
                 || isPathPublic(path, "/api/transcribe")
+                || isPathPublic(path, "/fallback")
+                || isPathPublic(path, "/actuator/health")
                 || isPathPublic(path, "/v3/api-docs")
                 || isPathPublic(path, "/swagger-ui")
                 || "/swagger-ui.html".equals(path);

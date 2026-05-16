@@ -83,6 +83,40 @@ class JwtFilterTest {
     }
 
     @Test
+    void filter_FallbackPath_AllowsRequest() {
+        JwtUtil jwtUtil = mock(JwtUtil.class);
+        GatewayFilterChain chain = mock(GatewayFilterChain.class);
+        when(chain.filter(any())).thenReturn(Mono.empty());
+
+        JwtFilter jwtFilter = new JwtFilter();
+        ReflectionTestUtils.setField(jwtFilter, "jwtUtil", jwtUtil);
+        MockServerWebExchange exchange = MockServerWebExchange.from(
+                MockServerHttpRequest.get("/fallback").build()
+        );
+
+        jwtFilter.filter(exchange, chain).block();
+        verify(chain, times(1)).filter(exchange);
+        verifyNoInteractions(jwtUtil);
+    }
+
+    @Test
+    void filter_ActuatorHealthPath_AllowsRequest() {
+        JwtUtil jwtUtil = mock(JwtUtil.class);
+        GatewayFilterChain chain = mock(GatewayFilterChain.class);
+        when(chain.filter(any())).thenReturn(Mono.empty());
+
+        JwtFilter jwtFilter = new JwtFilter();
+        ReflectionTestUtils.setField(jwtFilter, "jwtUtil", jwtUtil);
+        MockServerWebExchange exchange = MockServerWebExchange.from(
+                MockServerHttpRequest.get("/actuator/health").build()
+        );
+
+        jwtFilter.filter(exchange, chain).block();
+        verify(chain, times(1)).filter(exchange);
+        verifyNoInteractions(jwtUtil);
+    }
+
+    @Test
     void filter_ValidToken_AllowsRequest() {
         JwtUtil jwtUtil = mock(JwtUtil.class);
         when(jwtUtil.validateToken("valid.token")).thenReturn(true);
