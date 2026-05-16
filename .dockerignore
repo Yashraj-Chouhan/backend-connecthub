@@ -1,0 +1,14 @@
+.git
+.idea
+target/
+logs/
+uploads/
+data/
+*.ps1
+*.md
+*.mv.db
+*.lock
+.classpath
+.project
+.settings/
+*.class

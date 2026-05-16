@@ -1,0 +1,142 @@
+ server:
+  address: ${SERVER_ADDRESS:0.0.0.0}
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: GATEWAY-SERVICE
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+
+  cloud:
+    gateway:
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 10
+            redis-rate-limiter.burstCapacity: 20
+            redis-rate-limiter.requestedTokens: 1
+            key-resolver: "#{@ipKeyResolver}"
+        - name: CircuitBreaker
+          args:
+            name: globalCircuitBreaker
+            fallbackUri: forward:/fallback
+      routes:
+        - id: payment-user-route
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/payments/users,/payments/users/**
+          filters:
+            - RewritePath=/payments(?<segment>/users(?:/.*)?), /auth$\{segment}
+
+        - id: websocket-service-ws
+          order: -1
+          uri: lb:ws://WEBSOCKET-SERVICE
+          predicates:
+            - Path=/ws,/ws/**
+            - Header=Upgrade, (?i)websocket
+
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth,/auth/**
+
+        - id: room-service
+          uri: lb://ROOM-SERVICE
+          predicates:
+            - Path=/rooms,/rooms/**
+
+        - id: message-service
+          uri: lb://MESSAGE-SERVICE
+          predicates:
+            - Path=/messages,/messages/**
+
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notifications,/notifications/**
+
+        - id: presence-service
+          uri: lb://PRESENCE-SERVICE
+          predicates:
+            - Path=/presence,/presence/**
+
+        - id: translation-service
+          uri: lb://TRANSLATION-SERVICE
+          predicates:
+            - Path=/translate,/translate/**,/api/translate,/api/translate/**,/transcribe,/transcribe/**,/api/transcribe,/api/transcribe/**
+
+        - id: websocket-service
+          uri: lb://WEBSOCKET-SERVICE
+          predicates:
+            - Path=/ws,/ws/**
+
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payments,/payments/**
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: ${EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS:5}
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:9000/eureka/}
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+    prefer-ip-address: false
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, circuitbreakers
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      globalCircuitBreaker:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: ${GATEWAY_CIRCUIT_BREAKER_OPEN_WAIT:5s}
+        permittedNumberOfCallsInHalfOpenState: 3
+  timelimiter:
+    instances:
+      globalCircuitBreaker:
+        timeoutDuration: ${GATEWAY_GLOBAL_TIMEOUT_DURATION:8s}
+
+app:
+  cors:
+    allowed-origin-patterns:
+      - http://localhost:[*]
+      - http://127.0.0.1:[*]
+      - https://localhost:[*]
+      - https://127.0.0.1:[*]
+      - http://10.*.*.*:[*]
+      - http://172.*.*.*:[*]
+      - http://192.168.*.*:[*]
+      - http://169.254.*.*:[*]
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+      - OPTIONS
+    allowed-headers:
+      - "*"
+    allow-credentials: true
+    max-age: 3600

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectHub Project Structure Overview</title>
+    <style>
+        :root {
+            --ink: #18212b;
+            --muted: #52606d;
+            --line: #d7dee7;
+            --soft: #f4f7fb;
+            --brand: #0f4c81;
+            --accent: #0e8a6a;
+            --warn: #b16500;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            color: var(--ink);
+            background: #eef3f8;
+            line-height: 1.5;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: #fff;
+            padding: 18mm 16mm;
+        }
+
+        h1, h2, h3 {
+            margin: 0 0 10px;
+            color: var(--ink);
+        }
+
+        h1 {
+            font-size: 28px;
+            line-height: 1.15;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-top: 22px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--line);
+        }
+
+        h3 {
+            font-size: 15px;
+            margin-top: 14px;
+        }
+
+        p {
+            margin: 0 0 10px;
+            color: var(--ink);
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        .hero {
+            border: 1px solid var(--line);
+            background: linear-gradient(135deg, #f8fbff 0%, #eef7f4 100%);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .summary-grid,
+        .card-grid,
+        .flow-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .summary-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .card-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .flow-grid {
+            grid-template-columns: repeat(4, 1fr);
+            align-items: stretch;
+        }
+
+        .box {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 12px;
+            background: #fff;
+        }
+
+        .metric {
+            border-left: 5px solid var(--brand);
+            background: var(--soft);
+        }
+
+        .metric strong {
+            display: block;
+            font-size: 22px;
+            color: var(--brand);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #e9f1fb;
+            color: var(--brand);
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0 6px 6px 0;
+        }
+
+        ul {
+            margin: 8px 0 0 18px;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .architecture {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr 1.2fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stack {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stack .node {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+        }
+
+        .node strong {
+            display: block;
+            color: var(--brand);
+            margin-bottom: 4px;
+        }
+
+        .mid {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .mid .hub {
+            text-align: center;
+            border-radius: 12px;
+            padding: 16px 10px;
+            border: 1px solid #bfd1e5;
+            background: #f7fbff;
+            font-weight: 700;
+            color: var(--brand);
+        }
+
+        .service-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .service-table th,
+        .service-table td {
+            border: 1px solid var(--line);
+            padding: 9px 10px;
+            vertical-align: top;
+        }
+
+        .service-table th {
+            background: var(--soft);
+            text-align: left;
+        }
+
+        .flow-step {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 12px;
+            background: #fbfdff;
+        }
+
+        .flow-step strong {
+            display: block;
+            color: var(--brand);
+            margin-bottom: 6px;
+        }
+
+        .callout {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border-left: 5px solid var(--accent);
+            background: #eef8f4;
+            border-radius: 8px;
+        }
+
+        .warning {
+            border-left-color: var(--warn);
+            background: #fff7ea;
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .section-spacer {
+            margin-top: 18px;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            .page {
+                width: auto;
+                min-height: auto;
+                margin: 0;
+                padding: 12mm;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="hero">
+        <h1>ConnectHub Project Structure Overview</h1>
+        <p class="subtitle">
+            Manager and client friendly architecture document for explaining what the project does,
+            how the system is structured, and how the main business flows work.
+        </p>
+        <div>
+            <span class="tag">Microservices Architecture</span>
+            <span class="tag">Real-Time Communication</span>
+            <span class="tag">Translation Workflow</span>
+            <span class="tag">Payment and Credits</span>
+            <span class="tag">Gateway + Kafka + Redis</span>
+        </div>
+    </div>
+
+    <div class="summary-grid">
+        <div class="box metric">
+            <strong>9</strong>
+            backend services working together
+        </div>
+        <div class="box metric">
+            <strong>1</strong>
+            gateway for all client requests
+        </div>
+        <div class="box metric">
+            <strong>4</strong>
+            major flows: onboarding, chat, translation, payment
+        </div>
+    </div>
+
+    <h2>1. Project Purpose</h2>
+    <p>
+        ConnectHub is a real-time communication platform designed for more than normal chat.
+        It supports user onboarding, room-based communication, live message delivery, presence,
+        notifications, multilingual translation, and payment-based credit top-up in one connected system.
+    </p>
+    <div class="card-grid">
+        <div class="box">
+            <h3>Business Goal</h3>
+            <ul>
+                <li>enable fast communication between users and teams</li>
+                <li>remove language barriers with message translation</li>
+                <li>support premium translation credits with payment integration</li>
+            </ul>
+        </div>
+        <div class="box">
+            <h3>Technical Goal</h3>
+            <ul>
+                <li>split responsibilities into focused services</li>
+                <li>support real-time delivery and scalable communication</li>
+                <li>make the platform easier to maintain and extend</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>2. How the System Is Structured</h2>
+    <p>
+        The system follows a microservices model. Each service owns a specific responsibility,
+        while the API Gateway, Eureka, Kafka, Redis, and databases support communication and reliability.
+    </p>
+
+    <div class="architecture">
+        <div class="stack">
+            <div class="node">
+                <strong>Client Layer</strong>
+                Web or mobile frontend sends HTTP requests and WebSocket events.
+            </div>
+            <div class="node">
+                <strong>Gateway Service</strong>
+                Single public entry point for routing requests to internal services.
+            </div>
+            <div class="node">
+                <strong>Eureka Server</strong>
+                Service registry used so services can discover each other dynamically.
+            </div>
+        </div>
+
+        <div class="mid">
+            <div class="hub">ConnectHub Core Platform</div>
+            <div class="hub">Real-Time + Event-Driven + Service Based</div>
+        </div>
+
+        <div class="stack">
+            <div class="node">
+                <strong>Kafka</strong>
+                Handles asynchronous chat and credit top-up events.
+            </div>
+            <div class="node">
+                <strong>Redis</strong>
+                Stores fast-changing user presence data.
+            </div>
+            <div class="node">
+                <strong>Databases</strong>
+                Store users, rooms, messages, notifications, and payments.
+            </div>
+        </div>
+    </div>
+
+    <h2>3. Service Responsibilities</h2>
+    <table class="service-table">
+        <thead>
+        <tr>
+            <th>Service</th>
+            <th>Main Responsibility</th>
+            <th>Why It Exists</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Gateway Service</strong></td>
+            <td>routes all client requests</td>
+            <td>keeps one public entry point and hides internal complexity</td>
+        </tr>
+        <tr>
+            <td><strong>Auth Service</strong></td>
+            <td>registration, login, profile, contacts, credits</td>
+            <td>acts as the identity and user account center of the platform</td>
+        </tr>
+        <tr>
+            <td><strong>Room Service</strong></td>
+            <td>rooms, members, admins, room metadata</td>
+            <td>controls who can communicate with whom</td>
+        </tr>
+        <tr>
+            <td><strong>Message Service</strong></td>
+            <td>message persistence, history, search, attachments, reactions</td>
+            <td>stores the actual conversation history reliably</td>
+        </tr>
+        <tr>
+            <td><strong>WebSocket Service</strong></td>
+            <td>live delivery, typing indicators, read receipts, fan-out</td>
+            <td>powers the real-time user experience</td>
+        </tr>
+        <tr>
+            <td><strong>Notification Service</strong></td>
+            <td>unread notifications and read status</td>
+            <td>preserves alerts even when a user is offline</td>
+        </tr>
+        <tr>
+            <td><strong>Presence Service</strong></td>
+            <td>online/offline tracking</td>
+            <td>handles highly dynamic status updates efficiently through Redis</td>
+        </tr>
+        <tr>
+            <td><strong>Translation Service</strong></td>
+            <td>message translation</td>
+            <td>separates language processing from core messaging logic</td>
+        </tr>
+        <tr>
+            <td><strong>Payment Service</strong></td>
+            <td>order creation, payment verification, credit top-up</td>
+            <td>connects technical features to business monetization</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2>4. Main Functional Flows</h2>
+
+    <h3>4.1 User Onboarding Flow</h3>
+    <div class="flow-grid">
+        <div class="flow-step">
+            <strong>Step 1</strong>
+            User registers through the gateway.
+        </div>
+        <div class="flow-step">
+            <strong>Step 2</strong>
+            Auth Service validates details and completes OTP-based registration.
+        </div>
+        <div class="flow-step">
+            <strong>Step 3</strong>
+            User logs in and receives account information.
+        </div>
+        <div class="flow-step">
+            <strong>Result</strong>
+            User becomes ready for rooms, chat, and translation usage.
+        </div>
+    </div>
+
+    <h3>4.2 Room and Collaboration Flow</h3>
+    <div class="flow-grid">
+        <div class="flow-step">
+            <strong>Step 1</strong>
+            User creates a group room or direct room.
+        </div>
+        <div class="flow-step">
+            <strong>Step 2</strong>
+            Room Service stores room details and member list.
+        </div>
+        <div class="flow-step">
+            <strong>Step 3</strong>
+            Admin can add, remove, or promote members.
+        </div>
+        <div class="flow-step">
+            <strong>Result</strong>
+            The room becomes the communication boundary for chat events.
+        </div>
+    </div>
+
+    <h3>4.3 Real-Time Messaging Flow</h3>
+    <div class="flow-grid">
+        <div class="flow-step">
+            <strong>Step 1</strong>
+            User sends a message over WebSocket.
+        </div>
+        <div class="flow-step">
+            <strong>Step 2</strong>
+            WebSocket Service forwards the event to Kafka.
+        </div>
+        <div class="flow-step">
+            <strong>Step 3</strong>
+            Message Service stores the message and republishes the saved event.
+        </div>
+        <div class="flow-step">
+            <strong>Result</strong>
+            WebSocket Service broadcasts the final saved message to room users.
+        </div>
+    </div>
+    <div class="callout">
+        This is one of the strongest architectural points of ConnectHub:
+        message acceptance, persistence, and delivery are separated into different stages,
+        which improves reliability and scalability.
+    </div>
+
+    <h3>4.4 Translation Flow</h3>
+    <div class="flow-grid">
+        <div class="flow-step">
+            <strong>Step 1</strong>
+            User requests translation for a message.
+        </div>
+        <div class="flow-step">
+            <strong>Step 2</strong>
+            Message Service consumes one translation credit from Auth Service.
+        </div>
+        <div class="flow-step">
+            <strong>Step 3</strong>
+            Translation Service translates the content into the target language.
+        </div>
+        <div class="flow-step">
+            <strong>Result</strong>
+            User receives translated content and updated credit balance.
+        </div>
+    </div>
+
+    <h3>4.5 Payment to Credit Flow</h3>
+    <div class="flow-grid">
+        <div class="flow-step">
+            <strong>Step 1</strong>
+            User selects a top-up plan and creates an order.
+        </div>
+        <div class="flow-step">
+            <strong>Step 2</strong>
+            Payment Service verifies provider payment details.
+        </div>
+        <div class="flow-step">
+            <strong>Step 3</strong>
+            Payment Service publishes a credit top-up event to Kafka.
+        </div>
+        <div class="flow-step">
+            <strong>Result</strong>
+            Auth Service updates the user credit balance.
+        </div>
+    </div>
+
+    <h2>5. Supporting Platform Components</h2>
+    <div class="card-grid">
+        <div class="box">
+            <h3>Kafka</h3>
+            <p>Used for asynchronous communication where direct coupling is not ideal.</p>
+            <ul>
+                <li>chat ingestion and broadcast</li>
+                <li>credit top-up synchronization</li>
+                <li>presence event publishing</li>
+            </ul>
+        </div>
+        <div class="box">
+            <h3>Redis</h3>
+            <p>Used for lightweight and fast-changing online/offline user status.</p>
+            <ul>
+                <li>quick read and write for presence</li>
+                <li>better fit than a relational database for temporary state</li>
+            </ul>
+        </div>
+        <div class="box">
+            <h3>Databases</h3>
+            <p>Each domain keeps its own data ownership boundary.</p>
+            <ul>
+                <li>users in auth database</li>
+                <li>rooms and memberships in room database</li>
+                <li>messages and attachments in message database</li>
+                <li>payments in payment database</li>
+            </ul>
+        </div>
+        <div class="box">
+            <h3>WebSocket + STOMP</h3>
+            <p>Provides live communication for chat-based features.</p>
+            <ul>
+                <li>message delivery</li>
+                <li>typing indication</li>
+                <li>read receipts</li>
+                <li>live user notifications</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>6. Why This Architecture Is Valuable</h2>
+    <div class="card-grid">
+        <div class="box">
+            <h3>Scalability</h3>
+            <p>Services can grow independently based on load. For example, WebSocket and Message services can scale differently from Payment Service.</p>
+        </div>
+        <div class="box">
+            <h3>Maintainability</h3>
+            <p>Each service owns one business domain, which makes debugging, enhancement, and onboarding easier.</p>
+        </div>
+        <div class="box">
+            <h3>Reliability</h3>
+            <p>Kafka reduces tight coupling and allows the platform to process important events without blocking user actions.</p>
+        </div>
+        <div class="box">
+            <h3>Business Readiness</h3>
+            <p>Translation credits and payment top-up add a monetization path instead of keeping the project as only a technical demo.</p>
+        </div>
+    </div>
+
+    <h2>7. Best Way to Explain the Project</h2>
+    <div class="box">
+        <p><strong>Recommended explanation order for managers, clients, or reviewers:</strong></p>
+        <ol>
+            <li>start with the business problem: chat + translation + real-time collaboration</li>
+            <li>show the architecture: gateway, services, Kafka, Redis, databases</li>
+            <li>explain service responsibilities clearly one by one</li>
+            <li>walk through the real-time message flow from client to delivery</li>
+            <li>show how translation and payment create product value</li>
+            <li>end with why microservices were chosen and what makes the system scalable</li>
+        </ol>
+    </div>
+
+    <div class="callout">
+        Best one-line explanation:
+        <strong>
+            ConnectHub is a microservices-based real-time communication platform that combines chat,
+            live delivery, multilingual translation, notifications, presence tracking, and payment-driven
+            credits in one scalable backend ecosystem.
+        </strong>
+    </div>
+
+    <div class="callout warning">
+        Important presentation note:
+        when explaining this project to a manager or client, focus first on user value and flow,
+        then explain the technical design that enables that value. This project becomes much easier
+        to understand when presented from outcome to architecture, not the other way around.
+    </div>
+
+    <h2>8. Conclusion</h2>
+    <p>
+        ConnectHub is not just a CRUD project. It is a structured communication platform where each service
+        supports a clear business function. The architecture demonstrates distributed-system thinking,
+        real-time communication design, asynchronous event handling, and product-oriented features such as
+        translation credits and payment integration.
+    </p>
+
+    <p class="footer-note">
+        Prepared from the current ConnectHub backend structure for explanation, review, and stakeholder communication.
+    </p>
+</div>
+</body>
+</html>

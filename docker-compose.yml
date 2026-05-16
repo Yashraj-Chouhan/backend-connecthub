@@ -1,0 +1,280 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.4
+    container_name: connecthub-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.4
+    container_name: connecthub-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: connecthub-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.4
+    container_name: connecthub-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: connecthub_auth
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+
+  sonarqube-db:
+    profiles:
+      - quality
+    image: postgres:15-alpine
+    container_name: connecthub-sonarqube-db
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonarqube
+    volumes:
+      - sonarqube-postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  sonarqube:
+    profiles:
+      - quality
+    image: sonarqube:lts-community
+    container_name: connecthub-sonarqube
+    depends_on:
+      - sonarqube-db
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    ports:
+      - "9030:9000"
+    volumes:
+      - sonarqube-data:/opt/sonarqube/data
+      - sonarqube-extensions:/opt/sonarqube/extensions
+      - sonarqube-logs:/opt/sonarqube/logs
+    restart: unless-stopped
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: connecthub-eureka-server
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: connecthub-auth-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
+      EUREKA_INSTANCE_HOSTNAME: auth-service
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/connecthub_auth?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      GOOGLE_AUTH_ALLOWED_CLIENT_IDS: ${GOOGLE_AUTH_ALLOWED_CLIENT_IDS:-}
+    depends_on:
+      - eureka-server
+      - mysql
+    ports:
+      - "9002:9002"
+    restart: unless-stopped
+
+  room-service:
+    build:
+      context: ./room-service
+      dockerfile: Dockerfile
+    container_name: connecthub-room-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
+      EUREKA_INSTANCE_HOSTNAME: room-service
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/connecthub_room?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      - eureka-server
+      - mysql
+    ports:
+      - "9003:9003"
+    restart: unless-stopped
+
+  message-service:
+    build:
+      context: ./message-service
+      dockerfile: Dockerfile
+    container_name: connecthub-message-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
+      EUREKA_INSTANCE_HOSTNAME: message-service
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/connecthub_message?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      TRANSLATION_SERVICE_URL: http://translation-service:9013
+    depends_on:
+      - eureka-server
+      - mysql
+      - kafka
+    ports:
+      - "9004:9004"
+    restart: unless-stopped
+    volumes:
+      - message-uploads:/app/uploads
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: connecthub-notification-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
+      EUREKA_INSTANCE_HOSTNAME: notification-service
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/connecthub_notification?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      - eureka-server
+      - mysql
+    ports:
+      - "9007:9007"
+    restart: unless-stopped
+
+  presence-service:
+    build:
+      context: ./presence-service
+      dockerfile: Dockerfile
+    container_name: connecthub-presence-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
+      EUREKA_INSTANCE_HOSTNAME: presence-service
+      REDIS_HOST: redis
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      - eureka-server
+      - redis
+      - kafka
+    ports:
+      - "9012:9012"
+    restart: unless-stopped
+
+  translation-service:
+    build:
+      context: ./translation-service
+      dockerfile: Dockerfile
+    container_name: connecthub-translation-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
+      EUREKA_INSTANCE_HOSTNAME: translation-service
+      GEMINI_API_ENABLED: ${GEMINI_API_ENABLED:-true}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_API_MODEL: ${GEMINI_API_MODEL:-gemini-2.5-flash}
+      GEMINI_API_URL: ${GEMINI_API_URL:-https://generativelanguage.googleapis.com/v1beta/models}
+      TRANSLATION_API_URL: ${TRANSLATION_API_URL:-https://libretranslate.de/translate}
+      TRANSLATION_API_KEY: ${TRANSLATION_API_KEY:-}
+      TRANSLATION_API_TIMEOUT: ${TRANSLATION_API_TIMEOUT:-5000}
+      SPEECH_API_KEY: ${SPEECH_API_KEY}
+      SPEECH_PROVIDER: ${SPEECH_PROVIDER:-groq-speech-to-text}
+      SPEECH_API_URL: ${SPEECH_API_URL:-https://api.groq.com/openai/v1/audio/transcriptions}
+      SPEECH_API_MODEL: ${SPEECH_API_MODEL:-whisper-large-v3-turbo}
+    depends_on:
+      - eureka-server
+    ports:
+      - "9013:9013"
+    restart: unless-stopped
+
+  websocket-service:
+    build:
+      context: ./websocket-service
+      dockerfile: Dockerfile
+    container_name: connecthub-websocket-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
+      EUREKA_INSTANCE_HOSTNAME: websocket-service
+      CONNECTHUB_LAN_ORIGIN: ${CONNECTHUB_LAN_ORIGIN:-http://10.0.5.17:5173}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      - eureka-server
+      - kafka
+    ports:
+      - "9014:9014"
+    restart: unless-stopped
+
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    container_name: connecthub-payment-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
+      EUREKA_INSTANCE_HOSTNAME: payment-service
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/connecthub_payment?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      - eureka-server
+      - mysql
+      - auth-service
+    ports:
+      - "9015:9015"
+    restart: unless-stopped
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    container_name: connecthub-gateway-service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
+      EUREKA_INSTANCE_HOSTNAME: gateway-service
+      CONNECTHUB_LAN_ORIGIN: ${CONNECTHUB_LAN_ORIGIN:-http://10.0.5.17:5173}
+      REDIS_HOST: redis
+    depends_on:
+      - eureka-server
+      - auth-service
+      - room-service
+      - message-service
+      - notification-service
+      - presence-service
+      - translation-service
+      - websocket-service
+      - payment-service
+      - redis
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
+  redis-data:
+  message-uploads:
+  sonarqube-data:
+  sonarqube-extensions:
+  sonarqube-logs:
+  sonarqube-postgres-data:

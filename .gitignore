@@ -1,0 +1,131 @@
+# ===============================
+
+# Java / Spring Boot
+
+# ===============================
+
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# Maven
+
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+
+.gradle/
+build/
+
+# ===============================
+
+# IDE Files
+
+# ===============================
+
+# IntelliJ IDEA
+
+.idea/
+*.iml
+
+# Eclipse
+
+.project
+.classpath
+.settings/
+
+# VS Code
+
+.vscode/
+
+# ===============================
+
+# OS Files
+
+# ===============================
+
+.DS_Store
+Thumbs.db
+
+# ===============================
+
+# Logs
+
+# ===============================
+
+logs/
+*.log
+
+# ===============================
+
+# Environment Files
+
+# ===============================
+
+.env
+.env.*
+application-local.yml
+application-dev.yml
+
+# ===============================
+
+# Database
+
+# ===============================
+
+*.db
+*.sqlite
+
+# ===============================
+
+# Redis / Cache / Temp
+
+# ===============================
+
+dump.rdb
+*.rdb
+temp/
+tmp/
+
+# ===============================
+
+# Node (if frontend inside repo)
+
+# ===============================
+
+node_modules/
+dist/
+build/
+
+# ===============================
+
+# Test Reports
+
+# ===============================
+
+/test-output/
+/surefire-reports/
+/coverage/
+
+# ===============================
+
+# Docker
+
+# ===============================
+
+*.pid
+*.seed
+*.pid.lock
+
+# ===============================
+
+# Misc
+
+# ===============================
+
+*.swp
+*.bak
+*.tmp

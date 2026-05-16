@@ -1,0 +1,15 @@
+ARG MODULE_PATH=eureka-server
+FROM maven:3.9.11-eclipse-temurin-17 AS build
+WORKDIR /workspace
+COPY pom.xml .
+COPY ${MODULE_PATH} ./${MODULE_PATH}
+RUN mvn -q -DskipTests package -pl ${MODULE_PATH} -am 2>&1 | grep -E '(ERROR|BUILD)' || true
+
+FROM eclipse-temurin:17-jre-jammy
+ARG MODULE_PATH=eureka-server
+WORKDIR /app
+RUN useradd -r -u 1001 appuser && mkdir -p /app && chown -R appuser:appuser /app
+COPY --from=build /workspace/${MODULE_PATH}/target/*.jar /app/app.jar
+USER appuser
+EXPOSE 9000
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "/app/app.jar"]

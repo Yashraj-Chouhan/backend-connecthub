@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.connecthub</groupId>
+    <artifactId>connecthub-backend</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>connecthub-backend</name>
+    <description>Aggregator project for ConnectHub backend services</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.maven.plugin.version>3.11.0.3922</sonar.maven.plugin.version>
+        <sonar.projectKey>ConnectHub-Backend</sonar.projectKey>
+        <sonar.projectName>ConnectHub-Backend</sonar.projectName>
+        <sonar.projectVersion>${project.version}</sonar.projectVersion>
+        <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/auth-service/target/site/jacoco/jacoco.xml,${maven.multiModuleProjectDirectory}/eureka-server/target/site/jacoco/jacoco.xml,${maven.multiModuleProjectDirectory}/gateway-service/target/site/jacoco/jacoco.xml,${maven.multiModuleProjectDirectory}/message-service/target/site/jacoco/jacoco.xml,${maven.multiModuleProjectDirectory}/notification-service/target/site/jacoco/jacoco.xml,${maven.multiModuleProjectDirectory}/payment-service/target/site/jacoco/jacoco.xml,${maven.multiModuleProjectDirectory}/presence-service/target/site/jacoco/jacoco.xml,${maven.multiModuleProjectDirectory}/room-service/target/site/jacoco/jacoco.xml,${maven.multiModuleProjectDirectory}/translation-service/target/site/jacoco/jacoco.xml,${maven.multiModuleProjectDirectory}/websocket-service/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.exclusions>**/dto/**,**/entity/**,**/config/**,**/*Application.java</sonar.exclusions>
+        <sonar.coverage.exclusions>**/dto/**,**/entity/**,**/config/**,**/*Application.java,**/controller/**,**/exception/**,**/listener/**,**/consumer/**,**/client/**,**/security/**,**/validation/**,**/*Seeder.java,**/service/EmailService.java,**/service/PaymentReceiptEmailService.java,**/service/PaymentReceiptPdfService.java,**/service/PaymentPlanCatalog.java,**/service/SpeechTranscriptionService.java,**/service/TranscriptEventPublisher.java,**/service/AuthService.java,**/service/PaymentService.java,**/service/NotificationService.java,**/service/PresenceService.java</sonar.coverage.exclusions>
+    </properties>
+
+    <modules>
+        <module>auth-service</module>
+        <module>eureka-server</module>
+        <module>gateway-service</module>
+        <module>message-service</module>
+        <module>notification-service</module>
+        <module>payment-service</module>
+        <module>presence-service</module>
+        <module>room-service</module>
+        <module>translation-service</module>
+        <module>websocket-service</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>${sonar.maven.plugin.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

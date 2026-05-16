@@ -1,0 +1,80 @@
+server:
+  port: 9015
+
+spring:
+  application:
+    name: PAYMENT-SERVICE
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    admin:
+      fail-fast: false
+      auto-create: false
+    listener:
+      auto-startup: ${SPRING_KAFKA_LISTENER_AUTO_STARTUP:true}
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/connecthub_payment?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:Yash}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:com.mysql.cj.jdbc.Driver}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: placy.support@gmail.com
+    password: "fgkm vzvr eqxi vwso"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+app:
+  auth-service-base-url: ${AUTH_SERVICE_BASE_URL:http://localhost:9002}
+  auth-service-topup-secret: ${CONNECTHUB_TOPUP_SECRET:connecthub-topup-secret-change-me}
+  receipt:
+    company-name: ConnectHub
+    support-email: placy.support@gmail.com
+  topup:
+    merchant-name: ConnectHub Credits
+    support-message: Choose a bundle. Razorpay handles the checkout and the payment service verifies the signature before credits are synced back to your ConnectHub account automatically.
+    custom-credit-rate: 2.50
+    min-credits: 25
+    max-credits: 5000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:9000/eureka/}
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+    prefer-ip-address: false
+
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID:rzp_test_Sfd5AMyQZmmn9j}
+  key-secret: ${RAZORPAY_KEY_SECRET:GGNmYMt3atHUDkdoFYMd4VqD}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

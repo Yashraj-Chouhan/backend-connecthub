@@ -1,0 +1,49 @@
+server:
+  port: 9013
+
+spring:
+  application:
+    name: translation-service
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
+
+translation:
+  api:
+    url: ${TRANSLATION_API_URL:https://libretranslate.de/translate}
+    timeout: ${TRANSLATION_API_TIMEOUT:5000}
+    key: ${TRANSLATION_API_KEY:}
+  gemini:
+    enabled: ${GEMINI_API_ENABLED:true}
+    url: ${GEMINI_API_URL:https://generativelanguage.googleapis.com/v1beta/models}
+    model: ${GEMINI_API_MODEL:gemini-2.5-flash}
+    key: ${GEMINI_API_KEY:}
+
+speech:
+  api:
+    provider: ${SPEECH_PROVIDER:groq-speech-to-text}
+    url: ${SPEECH_API_URL:https://api.groq.com/openai/v1/audio/transcriptions}
+    timeout: 30000
+    key: ${SPEECH_API_KEY:}
+    model: ${SPEECH_API_MODEL:whisper-large-v3-turbo}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:9000/eureka/}
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+    prefer-ip-address: false
+
+logging:
+  level:
+    com.connecthub.translationservice: DEBUG
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ConnectHub Credits | Secure Top-up</title>
+    <meta name="description" content="Choose a credit pack, pay securely through Razorpay, and let the payment service verify before credits are added."/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/payments/styles.css"/>
+</head>
+<body>
+<div class="page-shell">
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+
+    <main class="app-card">
+        <section class="hero panel">
+            <div class="hero-copy">
+                <p class="eyebrow">ConnectHub Payment Studio</p>
+                <h1>Buy credits with a checkout flow that feels simple and safe.</h1>
+                <p class="lede">
+                    Pick a bundle, review the amount, and continue to Razorpay Checkout.
+                    The payment service verifies the payment signature first, then adds credits to your account.
+                </p>
+                <div class="hero-chips" aria-label="Checkout highlights">
+                    <span>Choose credits</span>
+                    <span>Secure checkout</span>
+                    <span>Server verified</span>
+                </div>
+                <div class="flow-strip" aria-label="Top-up steps">
+                    <span>1. Select credits</span>
+                    <span>2. Complete in Razorpay</span>
+                    <span>3. Credits sync after verification</span>
+                </div>
+            </div>
+
+            <div class="hero-side">
+                <div class="hero-metric hero-metric-accent">
+                    <span>Merchant</span>
+                    <strong id="merchantNameValue">ConnectHub Credits</strong>
+                    <p>All orders are created by the payment service and verified before your balance changes.</p>
+                </div>
+                <div class="hero-metric">
+                    <span>Currency</span>
+                    <strong>INR</strong>
+                </div>
+                <div class="hero-metric">
+                    <span>Verification</span>
+                    <strong>Razorpay + backend</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard-grid">
+            <article class="panel account-panel">
+                <div class="section-head">
+                    <div>
+                        <p class="section-kicker">Account lookup</p>
+                        <h2>Find your wallet first</h2>
+                    </div>
+                    <button type="button" id="loadAccountButton" class="secondary-button">Load wallet</button>
+                </div>
+
+                <div class="input-row">
+                    <input id="userIdInput" type="text" placeholder="Paste your ConnectHub user ID"/>
+                </div>
+                <p class="helper-copy">
+                    Loading the wallet is optional, but it helps you review your balance before paying.
+                </p>
+
+                <div class="account-summary" id="accountSummary">
+                    <p class="empty-state">
+                        Load an account to see current credits, profile details, and recent payment activity.
+                    </p>
+                </div>
+            </article>
+
+            <article class="panel wallet-panel">
+                <div class="section-head">
+                    <div>
+                        <p class="section-kicker">Order preview</p>
+                        <h2>What you are about to buy</h2>
+                    </div>
+                </div>
+
+                <div class="metric-grid">
+                    <div class="metric">
+                        <span>Current credits</span>
+                        <strong id="currentCreditsValue">--</strong>
+                    </div>
+                    <div class="metric">
+                        <span>Selected pack</span>
+                        <strong id="selectedPackNameValue">None</strong>
+                    </div>
+                    <div class="metric">
+                        <span>Projected price</span>
+                        <strong id="selectedPackPriceValue">--</strong>
+                    </div>
+                    <div class="metric">
+                        <span>After top-up</span>
+                        <strong id="projectedCreditsValue">--</strong>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="panel section-block">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Top-up plans</p>
+                    <h2>Choose a pack</h2>
+                </div>
+                <p class="section-note">Tap a card to select it. The payment service creates the order from that choice.</p>
+            </div>
+            <div id="planGrid" class="plan-grid"></div>
+        </section>
+
+        <section class="panel section-block custom-panel">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Flexible top-up</p>
+                    <h2>Pick your own credits</h2>
+                </div>
+                <button type="button" id="customSelectButton" class="ghost-button">Use custom amount</button>
+            </div>
+
+            <div class="custom-layout">
+                <div class="custom-controls">
+                    <label class="range-label" for="creditsRange">Credits</label>
+                    <input id="creditsRange" type="range" min="25" max="5000" step="25" value="150"/>
+                    <div class="number-row">
+                        <input id="creditsNumber" type="number" min="25" max="5000" step="25" value="150"/>
+                        <span class="rate-pill" id="customRateLabel">INR 2.50 / credit</span>
+                    </div>
+                </div>
+
+                <div class="custom-preview">
+                    <div class="preview-card">
+                        <span>Credits</span>
+                        <strong id="customCreditsLabel">150</strong>
+                    </div>
+                    <div class="preview-card">
+                        <span>Estimated amount</span>
+                        <strong id="customAmountLabel">INR 375</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="action-bar">
+            <button type="button" id="topUpButton" class="primary-button">Continue to secure payment</button>
+            <button type="button" id="refreshHistoryButton" class="secondary-button">Reload history</button>
+            <div id="statusBanner" class="status-banner" role="status" aria-live="polite">
+                Choose a pack, create the payment order, and let the payment service verify it before credits are added.
+            </div>
+        </section>
+
+        <section class="split-grid">
+            <article class="panel section-block">
+                <div class="section-head">
+                    <div>
+                        <p class="section-kicker">Recent activity</p>
+                        <h2>Top-up history</h2>
+                    </div>
+                </div>
+                <div id="historyList" class="history-list">
+                    <p class="empty-state">No payment history loaded yet.</p>
+                </div>
+            </article>
+
+            <article class="panel section-block">
+                <div class="section-head">
+                    <div>
+                        <p class="section-kicker">How it works</p>
+                        <h2>Three simple steps</h2>
+                    </div>
+                </div>
+                <ol class="steps">
+                    <li>Select one of the featured packs or enter a custom amount.</li>
+                    <li>The payment service creates a Razorpay order and opens secure checkout for that amount.</li>
+                    <li>After payment, the backend verifies the Razorpay signature before credits are added.</li>
+                </ol>
+                <div class="security-note">
+                    Credits are never added from the browser alone. The payment service checks the payment record before syncing your wallet.
+                </div>
+            </article>
+        </section>
+    </main>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="/payments/app.js" defer></script>
+</body>
+</html>

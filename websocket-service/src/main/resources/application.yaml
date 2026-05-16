@@ -1,0 +1,78 @@
+server:
+  port: 9014
+  shutdown: graceful
+
+spring:
+  application:
+    name: websocket-service
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterAccess=10m
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: websocket-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.connecthub.websocketservice.dto.ChatMessage
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:9000/eureka/}
+    registry-fetch-interval-seconds: 30
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+    prefer-ip-address: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+app:
+  websocket:
+    endpoint: /ws
+    application-destination-prefix: /app
+    broker-prefixes:
+      - /topic
+    allowed-origin-patterns:
+      - http://localhost:[*]
+      - http://127.0.0.1:[*]
+      - https://localhost:[*]
+      - https://127.0.0.1:[*]
+      - http://10.*.*.*:[*]
+      - http://172.*.*.*:[*]
+      - http://192.168.*.*:[*]
+      - http://169.254.*.*:[*]
+    heartbeat-incoming: 10s
+    heartbeat-outgoing: 10s
+    scheduler-pool-size: 1
+    room-topic-prefix: /topic/room
+    user-topic-prefix: /topic/user
+    message-size-limit-bytes: 262144
+    send-buffer-size-limit-bytes: 524288
+    send-time-limit-millis: 20000
+    max-text-message-buffer-size-bytes: 262144
+    max-binary-message-buffer-size-bytes: 262144
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
