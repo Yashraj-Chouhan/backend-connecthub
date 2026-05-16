@@ -1,0 +1,18 @@
+services:
+  caddy:
+    image: caddy:2.8
+    container_name: connecthub-caddy
+    restart: unless-stopped
+    depends_on:
+      - gateway-service
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  caddy-data:
+  caddy-config:
