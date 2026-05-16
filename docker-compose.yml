@@ -217,7 +217,7 @@ services:
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
       EUREKA_INSTANCE_HOSTNAME: websocket-service
-      CONNECTHUB_LAN_ORIGIN: ${CONNECTHUB_LAN_ORIGIN:-http://10.0.5.17:5173}
+      CONNECTHUB_FRONTEND_ORIGIN: ${CONNECTHUB_FRONTEND_ORIGIN:-http://localhost:5173}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       - eureka-server
@@ -253,7 +253,7 @@ services:
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
       EUREKA_INSTANCE_HOSTNAME: gateway-service
-      CONNECTHUB_LAN_ORIGIN: ${CONNECTHUB_LAN_ORIGIN:-http://10.0.5.17:5173}
+      CONNECTHUB_FRONTEND_ORIGIN: ${CONNECTHUB_FRONTEND_ORIGIN:-http://localhost:5173}
       REDIS_HOST: redis
     depends_on:
       - eureka-server

@@ -52,6 +52,7 @@ app:
     broker-prefixes:
       - /topic
     allowed-origin-patterns:
+      - ${CONNECTHUB_FRONTEND_ORIGIN:http://localhost:5173}
       - http://localhost:[*]
       - http://127.0.0.1:[*]
       - https://localhost:[*]
