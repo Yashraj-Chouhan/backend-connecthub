@@ -1,6 +1,12 @@
-{$PUBLIC_API_DOMAIN:api-16-170-18-188.nip.io} {
+:80 {
 	encode gzip
 
-	# Forward HTTP and WebSocket traffic to the Spring Cloud Gateway.
-	reverse_proxy gateway-service:8080
+	# Keep browser traffic on one HTTP origin so EC2 deployments do not depend
+	# on cross-origin API calls or HTTPS-only public proxy domains.
+	@gateway {
+		path /auth* /rooms* /messages* /notifications* /presence* /payments* /translate* /api/translate* /transcribe* /api/transcribe* /ws* /fallback* /actuator/health /v3/api-docs* /swagger-ui* /swagger-ui.html
+	}
+
+	reverse_proxy @gateway gateway-service:8080
+	reverse_proxy frontend:5173
 }

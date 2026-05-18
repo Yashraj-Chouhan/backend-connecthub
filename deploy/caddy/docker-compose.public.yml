@@ -1,20 +1,18 @@
 services:
+  frontend:
+    build:
+      args:
+        # Empty in production so the browser uses the same origin served by Caddy.
+        VITE_API_BASE_URL: ""
+
   caddy:
     image: caddy:2.8
     container_name: connecthub-caddy
     restart: unless-stopped
     depends_on:
+      - frontend
       - gateway-service
-    environment:
-      PUBLIC_API_DOMAIN: ${PUBLIC_API_DOMAIN:-api-16-170-18-188.nip.io}
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy-data:/data
-      - caddy-config:/config
-
-volumes:
-  caddy-data:
-  caddy-config:

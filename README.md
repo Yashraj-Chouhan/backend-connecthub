@@ -31,7 +31,21 @@ Only `GEMINI_API_KEY` and `SPEECH_API_KEY` are required for the default setup. L
 
 This now starts the backend services plus the frontend container on `http://localhost:5173`. The frontend image is built from the sibling `../frontend` project and uses `VITE_*` values from the backend-side `.env` or `.env.example`.
 
-The default Docker build points the browser app to `http://localhost:8080` for local development. When you deploy the frontend publicly, set `VITE_API_BASE_URL` to the public HTTPS API hostname from the Caddy setup, for example `https://api.connecthub.example.com` or `https://api-16-170-18-188.nip.io`. Do not point the deployed browser app at the raw `http://<server-ip>:8080` gateway URL. Set the optional `VITE_TURN_*` variables if you want the same TURN/STUN config that exists in the standalone frontend project.
+The default Docker build points the browser app to `http://localhost:8080` for local development. For the HTTP-only EC2 deployment path in [deploy/caddy/README.md](/C:/Users/yashr/Desktop/Projects/ConnectHub/backend/deploy/caddy/README.md), use the Caddy override so the browser app and backend API share the same origin on port `80`. That deploy flow intentionally clears `VITE_API_BASE_URL` during the frontend build so the production app calls the EC2 host it was loaded from instead of a separate API domain or raw `:8080` URL. Set the optional `VITE_TURN_*` variables if you want the same TURN/STUN config that exists in the standalone frontend project.
+
+### HTTP EC2 deployment
+
+Run this from the `backend` folder on the EC2 machine:
+
+```powershell
+docker compose -f docker-compose.yml -f deploy/caddy/docker-compose.public.yml up --build -d
+```
+
+Then open:
+
+```text
+http://<ec2-public-ip>
+```
 
 SonarQube is isolated behind an optional profile so normal startup behavior does not change.
 

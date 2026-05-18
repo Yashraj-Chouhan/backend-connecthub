@@ -1,71 +1,73 @@
-# Public HTTPS Setup For Vercel Frontend
+# HTTP EC2 Deployment
 
-Use this when your frontend is deployed on Vercel and your backend runs on a VM.
-
-## Why this is needed
-
-Your frontend is served over `https://...vercel.app`. Browsers block calls from that page to plain `http://...` backend URLs as mixed content. The backend must be reachable over HTTPS, and WebSocket traffic must use WSS.
+Use this setup when the frontend and backend both run on the same EC2 machine
+and you want plain HTTP instead of HTTPS.
 
 ## What this proxy does
 
 This Caddy setup:
 
-- terminates HTTPS on ports `80` and `443`
-- obtains and renews TLS certificates automatically
-- proxies both normal HTTP traffic and WebSocket traffic to `gateway-service:8080`
+- listens on port `80`
+- serves the frontend app at `http://<ec2-public-ip>/`
+- forwards backend API and WebSocket paths to `gateway-service:8080`
+- keeps browser traffic on one origin so login and API calls do not depend on CORS
 
-## Server prerequisites
+## Why this fixes the deployment issue
 
-1. Point a public DNS name to your backend server IP.
+Your earlier deployment mixed:
 
-Example:
+- frontend on `http://<ec2-ip>`
+- API calls to another host such as `http://api-...`
 
-- `api.connecthub.example.com -> 16.170.18.188`
+That created browser CORS and DNS issues. This proxy removes that split. The
+browser now loads the UI and calls the API from the same host.
 
-Quick no-domain test option:
+## Files used
 
-- `api-16-170-18-188.nip.io`
-- `16-170-18-188.sslip.io`
+- `deploy/caddy/Caddyfile`
+- `deploy/caddy/docker-compose.public.yml`
 
-`nip.io` and `sslip.io` map hostnames containing your IP address back to that IP and are commonly used for quick HTTPS testing.
+The override also rebuilds the frontend with an empty `VITE_API_BASE_URL` so
+the production app automatically calls the same origin that served it.
 
-2. Open inbound ports `80` and `443` on the VM / cloud firewall.
+## EC2 prerequisites
 
-3. In the backend `.env` on the server, set:
+1. Open inbound port `80` in the EC2 security group.
+2. Make sure no other service on the EC2 instance is already using port `80`.
+3. Run Docker from the `backend` folder on the EC2 machine.
 
-```env
-CONNECTHUB_FRONTEND_ORIGIN=https://connect-hub-frontend-ot329n5oq.vercel.app
-PUBLIC_API_DOMAIN=api.connecthub.example.com
-```
+## Deploy command
 
-For a quick test without buying a domain, you can use:
-
-```env
-CONNECTHUB_FRONTEND_ORIGIN=https://connect-hub-frontend-ot329n5oq.vercel.app
-PUBLIC_API_DOMAIN=api-16-170-18-188.nip.io
-```
-
-## Deploy commands
-
-Run from the backend folder on the server:
+Run this from the `backend` folder:
 
 ```powershell
-docker compose up -d --build gateway-service websocket-service
-docker compose -f docker-compose.yml -f deploy/caddy/docker-compose.public.yml up -d caddy
+docker compose -f docker-compose.yml -f deploy/caddy/docker-compose.public.yml up --build -d
 ```
 
-## Frontend configuration
+## How to access the app
 
-Your frontend must call the HTTPS gateway URL, not Eureka and not the raw HTTP IP.
+Open:
 
-Use:
+- `http://<ec2-public-ip>`
 
-- API base URL: `https://api.connecthub.example.com`
-- WebSocket URL: `wss://api.connecthub.example.com/ws`
+Do not use:
 
-If the frontend uses environment variables, update the existing API / WebSocket variables to these values.
+- `http://<ec2-public-ip>:5173` for normal browser usage
+- `http://<ec2-public-ip>:8080` directly from the frontend
+- `https://...` URLs unless you separately add TLS
 
-For the quick test option above, use:
+## Environment notes
 
-- API base URL: `https://api-16-170-18-188.nip.io`
-- WebSocket URL: `wss://api-16-170-18-188.nip.io/ws`
+For this HTTP-only EC2 path:
+
+- `VITE_API_BASE_URL` should be left empty in the deploy override
+- `CONNECTHUB_FRONTEND_ORIGIN` can stay set, but the backend now also accepts
+  broader HTTP origins to avoid raw-IP deployment failures
+
+## Health checks
+
+After startup:
+
+- frontend should open at `http://<ec2-public-ip>`
+- API health should work at `http://<ec2-public-ip>/actuator/health`
+- login should call `POST /auth/login` on the same host

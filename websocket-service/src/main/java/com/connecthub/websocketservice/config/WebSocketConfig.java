@@ -9,6 +9,8 @@ import org.springframework.web.socket.config.annotation.*;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSocketMessageBroker
 /**
@@ -60,8 +62,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        List<String> allowedOriginPatterns = properties.getAllowedOriginPatterns().stream()
+                .filter(pattern -> pattern != null && !pattern.isBlank())
+                .toList();
+
         registry.addEndpoint(properties.getEndpoint())
-                .setAllowedOriginPatterns(properties.getAllowedOriginPatterns().toArray(String[]::new))
+                .setAllowedOriginPatterns(allowedOriginPatterns.toArray(String[]::new))
                 .withSockJS();
     }
 }
