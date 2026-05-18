@@ -99,6 +99,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/connecthub_auth?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       GOOGLE_AUTH_ALLOWED_CLIENT_IDS: ${GOOGLE_AUTH_ALLOWED_CLIENT_IDS:-}
     depends_on:
       - eureka-server
@@ -238,6 +239,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/connecthub_payment?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_BASE_URL: http://auth-service:9002
     depends_on:
       - eureka-server
       - mysql
