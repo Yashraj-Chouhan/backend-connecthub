@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     depends_on:
       - gateway-service
+    environment:
+      PUBLIC_API_DOMAIN: ${PUBLIC_API_DOMAIN:-api-16-170-18-188.nip.io}
     ports:
       - "80:80"
       - "443:443"

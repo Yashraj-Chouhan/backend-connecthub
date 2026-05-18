@@ -4,7 +4,7 @@ Detailed system and deployment documentation:
 
 - `docs/PRODUCTION_DOCUMENTATION.md`
 
-### Start all backend services
+### Start the local stack
 Run from `backend` folder:
 
 ```powershell
@@ -29,7 +29,11 @@ SPEECH_API_MODEL=whisper-large-v3-turbo
 
 Only `GEMINI_API_KEY` and `SPEECH_API_KEY` are required for the default setup. LibreTranslate keeps a public default URL, so you only need `TRANSLATION_API_KEY` when you are using a protected LibreTranslate instance.
 
-This still starts the existing backend stack only. SonarQube is isolated behind an optional profile so normal startup behavior does not change.
+This now starts the backend services plus the frontend container on `http://localhost:5173`. The frontend image is built from the sibling `../frontend` project and uses `VITE_*` values from the backend-side `.env` or `.env.example`.
+
+The default Docker build points the browser app to `http://localhost:8080` for local development. When you deploy the frontend publicly, set `VITE_API_BASE_URL` to the public HTTPS API hostname from the Caddy setup, for example `https://api.connecthub.example.com` or `https://api-16-170-18-188.nip.io`. Do not point the deployed browser app at the raw `http://<server-ip>:8080` gateway URL. Set the optional `VITE_TURN_*` variables if you want the same TURN/STUN config that exists in the standalone frontend project.
+
+SonarQube is isolated behind an optional profile so normal startup behavior does not change.
 
 ### Stop all services
 
@@ -98,6 +102,7 @@ mvn --% -f pom.xml clean verify sonar:sonar -Dsonar.host.url=http://localhost:90
 The root Maven build now collects JaCoCo XML reports from every service, so the Sonar analysis runs across the full backend without changing service runtime logic.
 
 ### Core exposed ports
+- `5173` frontend
 - `8080` gateway-service
 - `9000` eureka-server
 - `9002` auth-service

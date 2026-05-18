@@ -270,6 +270,30 @@ services:
       - "8080:8080"
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: ..
+      dockerfile: backend/deploy/frontend.Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_AUTH_ALLOWED_CLIENT_IDS:-}
+        VITE_STUN_URLS: ${VITE_STUN_URLS:-}
+        VITE_TURN_CREDENTIALS_URL: ${VITE_TURN_CREDENTIALS_URL:-}
+        VITE_TURN_API_KEY: ${VITE_TURN_API_KEY:-}
+        VITE_TURN_REGION: ${VITE_TURN_REGION:-}
+        VITE_TURN_URLS: ${VITE_TURN_URLS:-}
+        VITE_TURN_USERNAME: ${VITE_TURN_USERNAME:-}
+        VITE_TURN_CREDENTIAL: ${VITE_TURN_CREDENTIAL:-}
+    container_name: connecthub-frontend
+    environment:
+      PORT: 5173
+      PING_MESSAGE: ${PING_MESSAGE:-ping}
+    depends_on:
+      - gateway-service
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+
 volumes:
   mysql-data:
   redis-data:

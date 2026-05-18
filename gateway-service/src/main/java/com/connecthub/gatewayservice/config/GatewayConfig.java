@@ -8,6 +8,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(GatewayCorsProperties.class)
@@ -22,7 +24,11 @@ public class GatewayConfig {
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOriginPatterns(corsProperties.getAllowedOriginPatterns());
+        List<String> allowedOriginPatterns = corsProperties.getAllowedOriginPatterns().stream()
+                .filter(pattern -> pattern != null && !pattern.isBlank())
+                .toList();
+
+        corsConfig.setAllowedOriginPatterns(allowedOriginPatterns);
         corsConfig.setMaxAge(corsProperties.getMaxAge());
         corsConfig.setAllowedMethods(corsProperties.getAllowedMethods());
         corsConfig.setAllowedHeaders(corsProperties.getAllowedHeaders());
