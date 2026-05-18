@@ -1,7 +1,9 @@
+# syntax=docker/dockerfile:1.7
 FROM maven:3.9.11-eclipse-temurin-17 AS build
 WORKDIR /workspace
 COPY . .
-RUN mvn -q clean package -DskipTests
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -B -ntp -Dmaven.wagon.http.retryHandler.count=5 clean package -DskipTests
 
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app

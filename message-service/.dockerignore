@@ -1,0 +1,10 @@
+target/
+.idea/
+.git/
+.m2-local-repo/
+data/
+uploads/
+*.log
+*.out
+*.err
+hs_err_pid*

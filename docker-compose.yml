@@ -101,6 +101,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       GOOGLE_AUTH_ALLOWED_CLIENT_IDS: ${GOOGLE_AUTH_ALLOWED_CLIENT_IDS:-}
+      CONNECTHUB_TOPUP_SECRET: ${CONNECTHUB_TOPUP_SECRET:-connecthub-topup-secret-change-me}
     depends_on:
       - eureka-server
       - mysql
@@ -139,6 +140,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       TRANSLATION_SERVICE_URL: http://translation-service:9013
+      CONNECTHUB_TOPUP_SECRET: ${CONNECTHUB_TOPUP_SECRET:-connecthub-topup-secret-change-me}
     depends_on:
       - eureka-server
       - mysql
@@ -241,6 +243,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       AUTH_SERVICE_BASE_URL: http://auth-service:9002
+      CONNECTHUB_TOPUP_SECRET: ${CONNECTHUB_TOPUP_SECRET:-connecthub-topup-secret-change-me}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
     depends_on:
       - eureka-server
       - mysql

@@ -1,0 +1,8 @@
+target/
+.idea/
+.git/
+data/
+*.log
+*.out
+*.err
+hs_err_pid*

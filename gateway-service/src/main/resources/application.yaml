@@ -72,7 +72,7 @@ spring:
           predicates:
             - Path=/auth/**
           filters:
-            - RewritePath=/auth/(?<segment>.*), /api/auth/$\{segment}
+            - RewritePath=/auth/(?<segment>.*), /auth/$\{segment}
 
         - id: room-service
           uri: lb://ROOM-SERVICE
