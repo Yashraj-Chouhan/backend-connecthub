@@ -1,9 +1,24 @@
 services:
   frontend:
     build:
+      context: ..
+      dockerfile: frontend/Dockerfile
       args:
         # Empty in production so the browser uses the same origin served by Caddy.
         VITE_API_BASE_URL: ""
+        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_AUTH_ALLOWED_CLIENT_IDS:-}
+        VITE_STUN_URLS: ${VITE_STUN_URLS:-}
+        VITE_TURN_CREDENTIALS_URL: ${VITE_TURN_CREDENTIALS_URL:-}
+        VITE_TURN_API_KEY: ${VITE_TURN_API_KEY:-}
+        VITE_TURN_REGION: ${VITE_TURN_REGION:-}
+        VITE_TURN_URLS: ${VITE_TURN_URLS:-}
+        VITE_TURN_USERNAME: ${VITE_TURN_USERNAME:-}
+        VITE_TURN_CREDENTIAL: ${VITE_TURN_CREDENTIAL:-}
+    container_name: connecthub-frontend
+    environment:
+      PORT: 5173
+      PING_MESSAGE: ${PING_MESSAGE:-ping}
+    restart: unless-stopped
 
   caddy:
     image: caddy:2.8

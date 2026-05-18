@@ -122,14 +122,11 @@ app:
   cors:
     allowed-origin-patterns:
       - ${CONNECTHUB_FRONTEND_ORIGIN:http://localhost:5173}
+      - ${CONNECTHUB_FRONTEND_ALT_ORIGIN:}
       - http://localhost:[*]
       - http://127.0.0.1:[*]
       - https://localhost:[*]
       - https://127.0.0.1:[*]
-      - http://*
-      - http://*:[*]
-      - https://*
-      - https://*:[*]
       - http://10.*.*.*:[*]
       - http://172.*.*.*:[*]
       - http://192.168.*.*:[*]

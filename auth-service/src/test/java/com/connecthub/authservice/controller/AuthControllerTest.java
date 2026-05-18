@@ -119,7 +119,8 @@ class AuthControllerTest {
                 "tester",
                 "english",
                 10,
-                "USER"
+                "USER",
+                null
         );
         when(authService.login(any(LoginRequest.class))).thenReturn(response);
 
@@ -146,7 +147,8 @@ class AuthControllerTest {
                 "googleuser",
                 "en",
                 50,
-                "USER"
+                "USER",
+                null
         );
         when(authService.loginWithGoogle(any(GoogleLoginRequest.class))).thenReturn(response);
 

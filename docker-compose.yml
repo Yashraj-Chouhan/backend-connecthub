@@ -218,6 +218,7 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
       EUREKA_INSTANCE_HOSTNAME: websocket-service
       CONNECTHUB_FRONTEND_ORIGIN: ${CONNECTHUB_FRONTEND_ORIGIN:-http://localhost:5173}
+      CONNECTHUB_FRONTEND_ALT_ORIGIN: ${CONNECTHUB_FRONTEND_ALT_ORIGIN:-}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       - eureka-server
@@ -254,6 +255,7 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:9000/eureka/
       EUREKA_INSTANCE_HOSTNAME: gateway-service
       CONNECTHUB_FRONTEND_ORIGIN: ${CONNECTHUB_FRONTEND_ORIGIN:-http://localhost:5173}
+      CONNECTHUB_FRONTEND_ALT_ORIGIN: ${CONNECTHUB_FRONTEND_ALT_ORIGIN:-}
       REDIS_HOST: redis
     depends_on:
       - eureka-server
@@ -267,31 +269,7 @@ services:
       - payment-service
       - redis
     ports:
-      - "8080:8080"
-    restart: unless-stopped
-
-  frontend:
-    build:
-      context: ..
-      dockerfile: backend/deploy/frontend.Dockerfile
-      args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
-        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_AUTH_ALLOWED_CLIENT_IDS:-}
-        VITE_STUN_URLS: ${VITE_STUN_URLS:-}
-        VITE_TURN_CREDENTIALS_URL: ${VITE_TURN_CREDENTIALS_URL:-}
-        VITE_TURN_API_KEY: ${VITE_TURN_API_KEY:-}
-        VITE_TURN_REGION: ${VITE_TURN_REGION:-}
-        VITE_TURN_URLS: ${VITE_TURN_URLS:-}
-        VITE_TURN_USERNAME: ${VITE_TURN_USERNAME:-}
-        VITE_TURN_CREDENTIAL: ${VITE_TURN_CREDENTIAL:-}
-    container_name: connecthub-frontend
-    environment:
-      PORT: 5173
-      PING_MESSAGE: ${PING_MESSAGE:-ping}
-    depends_on:
-      - gateway-service
-    ports:
-      - "5173:5173"
+      - "${GATEWAY_PUBLIC_PORT:-8080}:8080"
     restart: unless-stopped
 
 volumes:

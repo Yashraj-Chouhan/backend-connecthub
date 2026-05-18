@@ -4,7 +4,7 @@ Detailed system and deployment documentation:
 
 - `docs/PRODUCTION_DOCUMENTATION.md`
 
-### Start the local stack
+### Start the backend stack
 Run from `backend` folder:
 
 ```powershell
@@ -29,22 +29,23 @@ SPEECH_API_MODEL=whisper-large-v3-turbo
 
 Only `GEMINI_API_KEY` and `SPEECH_API_KEY` are required for the default setup. LibreTranslate keeps a public default URL, so you only need `TRANSLATION_API_KEY` when you are using a protected LibreTranslate instance.
 
-This now starts the backend services plus the frontend container on `http://localhost:5173`. The frontend image is built from the sibling `../frontend` project and uses `VITE_*` values from the backend-side `.env` or `.env.example`.
+This starts only the backend services. The frontend is deployed separately from the sibling `../frontend` project.
 
-The default Docker build points the browser app to `http://localhost:8080` for local development. For the HTTP-only EC2 deployment path in [deploy/caddy/README.md](/C:/Users/yashr/Desktop/Projects/ConnectHub/backend/deploy/caddy/README.md), use the Caddy override so the browser app and backend API share the same origin on port `80`. That deploy flow intentionally clears `VITE_API_BASE_URL` during the frontend build so the production app calls the EC2 host it was loaded from instead of a separate API domain or raw `:8080` URL. Set the optional `VITE_TURN_*` variables if you want the same TURN/STUN config that exists in the standalone frontend project.
+For an EC2 deployment with separate frontend and backend containers over plain HTTP, use the backend settings documented in [deploy/ec2/README.md](/C:/Users/yashr/Desktop/Projects/ConnectHub/backend/deploy/ec2/README.md) and the frontend settings documented in [frontend/deploy/ec2/README.md](</C:/Users/yashr/Desktop/Projects/ConnectHub/frontend/deploy/ec2/README.md>).
 
 ### HTTP EC2 deployment
 
-Run this from the `backend` folder on the EC2 machine:
-
-```powershell
-docker compose -f docker-compose.yml -f deploy/caddy/docker-compose.public.yml up --build -d
-```
-
-Then open:
+Set these values in the backend `.env` on EC2:
 
 ```text
-http://<ec2-public-ip>
+CONNECTHUB_FRONTEND_ORIGIN=http://<ec2-public-ip>
+GATEWAY_PUBLIC_PORT=8080
+```
+
+Then run:
+
+```powershell
+docker compose up --build -d
 ```
 
 SonarQube is isolated behind an optional profile so normal startup behavior does not change.
@@ -116,7 +117,6 @@ mvn --% -f pom.xml clean verify sonar:sonar -Dsonar.host.url=http://localhost:90
 The root Maven build now collects JaCoCo XML reports from every service, so the Sonar analysis runs across the full backend without changing service runtime logic.
 
 ### Core exposed ports
-- `5173` frontend
 - `8080` gateway-service
 - `9000` eureka-server
 - `9002` auth-service

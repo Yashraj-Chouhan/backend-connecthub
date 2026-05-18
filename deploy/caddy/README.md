@@ -1,7 +1,15 @@
-# HTTP EC2 Deployment
+# Optional Single-Origin Proxy Deployment
+
+For the default EC2 setup with separate frontend and backend containers over
+plain HTTP, use [deploy/ec2/README.md](/C:/Users/yashr/Desktop/Projects/ConnectHub/backend/deploy/ec2/README.md).
+
+This folder is only for the alternate setup where you want one extra reverse
+proxy container in front of the frontend and gateway. In this mode the
+override file temporarily adds a frontend service back into the combined stack
+just for that proxy deployment.
 
 Use this setup when the frontend and backend both run on the same EC2 machine
-and you want plain HTTP instead of HTTPS.
+and you want one public origin instead of separate frontend and backend ports.
 
 ## What this proxy does
 
