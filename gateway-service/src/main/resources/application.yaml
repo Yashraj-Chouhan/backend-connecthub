@@ -13,6 +13,31 @@ spring:
 
   cloud:
     gateway:
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOriginPatterns:
+              - ${CONNECTHUB_FRONTEND_ORIGIN:http://localhost:5173}
+              - http://localhost:[*]
+              - http://127.0.0.1:[*]
+              - https://localhost:[*]
+              - https://127.0.0.1:[*]
+              - http://10.*.*.*:[*]
+              - http://172.*.*.*:[*]
+              - http://192.168.*.*:[*]
+              - http://169.254.*.*:[*]
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
       default-filters:
         - name: RequestRateLimiter
           args:
@@ -20,11 +45,14 @@ spring:
             redis-rate-limiter.burstCapacity: 20
             redis-rate-limiter.requestedTokens: 1
             key-resolver: "#{@ipKeyResolver}"
+
         - name: CircuitBreaker
           args:
             name: globalCircuitBreaker
             fallbackUri: forward:/fallback
+
       routes:
+
         - id: payment-user-route
           uri: lb://AUTH-SERVICE
           predicates:
@@ -86,6 +114,7 @@ eureka:
     registry-fetch-interval-seconds: ${EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS:5}
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:9000/eureka/}
+
   instance:
     hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
     prefer-ip-address: false
@@ -93,6 +122,7 @@ eureka:
 springdoc:
   api-docs:
     path: /v3/api-docs
+
   swagger-ui:
     path: /swagger-ui.html
 
@@ -101,6 +131,7 @@ management:
     web:
       exposure:
         include: health, metrics, circuitbreakers
+
   endpoint:
     health:
       show-details: always
@@ -111,12 +142,13 @@ resilience4j:
       globalCircuitBreaker:
         slidingWindowSize: 10
         failureRateThreshold: 50
-        waitDurationInOpenState: ${GATEWAY_CIRCUIT_BREAKER_OPEN_WAIT:5s}
+        waitDurationInOpenState: 5s
         permittedNumberOfCallsInHalfOpenState: 3
+
   timelimiter:
     instances:
       globalCircuitBreaker:
-        timeoutDuration: ${GATEWAY_GLOBAL_TIMEOUT_DURATION:8s}
+        timeoutDuration: 8s
 
 app:
   cors:
